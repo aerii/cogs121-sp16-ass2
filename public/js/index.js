@@ -24,8 +24,8 @@
   var innerHeight = height - margin.top  - margin.bottom;
 
   // TODO: Input the proper values for the scales
-  var xScale = d3.scale.ordinal().rangeRoundBands([0, 10], 0);
-  var yScale = d3.scale.linear().range([30, 0]);
+  var xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.1);
+  var yScale = d3.scale.linear().range([height, 0]);
 
   // Define the chart
   var chart = d3
@@ -40,7 +40,8 @@
   xScale.domain(data.map(function (d){ return d.name; }));
 
   // TODO: Fix the yScale domain to scale with any ratings range
-  yScale.domain([0, 5]);
+  // yScale.domain([0, 5]);
+  yScale.domain([0, 10]);
 
   // Note all these values are hard coded numbers
   // TODO:
@@ -48,12 +49,12 @@
   // 2. Update the x, y, width, and height attributes to appropriate reflect this
   chart
     .selectAll(".bar")
-    .data([10, 20, 30, 40])
+    .data(data.map(function (d){ return d.rating; }))
     .enter().append("rect")
     .attr("class", "bar")
     .attr("x", function(d, i) { return i*100; })
-    .attr("width", 100)
-    .attr("y", function(d) { return 0; })
+    .attr("width", width/data.length)
+    .attr("y", function(d) { return height - (d*10); })
     .attr("height", function(d) { return d*10; });
 
   // Orient the x and y axis
@@ -62,12 +63,18 @@
 
   // TODO: Append X axis
   chart
-    .append("g");
+    .append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .selectAll("text") .style("text-anchor", "end") .attr("dx", "-.8em") .attr("dy", ".15em") .attr("transform", function(d) { return "rotate(-65)" });
 
 
   // TODO: Append Y axis
   chart
-    .append("g");
+    .append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
 
 
   // ASSIGNMENT PART 1B
