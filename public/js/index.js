@@ -17,7 +17,7 @@
   // Defining the margins and chart size
   // See margin conventions for more information
   var margin = {top: 20, right: 10, bottom: 100, left: 40},
-      width = 960 - margin.right - margin.left,
+      width = 960 - margin.right - margin.left + 60,
       height = 500 - margin.top - margin.bottom;
 
   var innerWidth  = width  - margin.left - margin.right;
@@ -53,9 +53,9 @@
     .enter().append("rect")
     .attr("class", "bar")
     .attr("x", function(d, i) { return i*100; })
-    .attr("width", width/data.length)
-    .attr("y", function(d) { return height - (d*10); })
-    .attr("height", function(d) { return d*10; });
+    .attr("width", width/(data.length+1))
+    .attr("y", function(d) { return height - (d*height/10); })
+    .attr("height", function(d) { return d*height/10; });
 
   // Orient the x and y axis
   var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
