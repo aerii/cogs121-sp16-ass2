@@ -43,7 +43,32 @@ app.get('/delphidata', function (req, res) {
   // for each gender. 
   // Display that data using D3 with gender on the x-axis and 
   // total respondents on the y-axis.
-  return { delphidata: "No data present." }
+  // return { delphidata: "No data present." }
+
+  // get a pg client from the connection pool
+  pg.connect(conString, function(err, client, done) {
+
+    var handleError = function(err) {
+      // no error occurred, continue with the request
+      if(!err) {
+        return false;
+      }
+      // An error occurred, remove the client from the connection pool.
+      if(client){
+        done(client);
+      }
+      res.writeHead(500, {'content-type': 'text/plain'});
+      res.end('An error occurred');
+      return true;
+    };
+    if(handleError(err)) return;
+
+    client.query('SELECT number_of_respondents, gender FROM cogs121_16_raw.cdph_smoking_prevalence_in_adults_1984_2013 WHERE year=2003', function(err, result) {
+      if(handleError(err)) return;
+      console.log(result.rows);
+      return { delphidata: result };    
+    });
+  });
 });
 
 

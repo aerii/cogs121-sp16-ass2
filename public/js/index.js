@@ -81,9 +81,11 @@
   // Grab the delphi data from the server
   d3.json("/delphidata", function(err, data) {
     if (err) {
+      console.log("Pt1");
       console.log(err);
       return;
     }
+    console.log("Pt2");
     console.log("Data", data);
   });
 
