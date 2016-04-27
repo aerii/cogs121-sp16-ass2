@@ -34,10 +34,6 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
-
-
-
-
 app.get('/delphidata', function (req, res) {
   // TODO
   // Connect to the DELPHI Database and return the proper information
@@ -47,24 +43,33 @@ app.get('/delphidata', function (req, res) {
   // for each gender. 
   // Display that data using D3 with gender on the x-axis and 
   // total respondents on the y-axis.
-  var client = new pg.Client(conString);
-  client.connect(function(err) {
-    if(err) {
-      return console.error('could not connect to postgres', err);
-    }
-    client.query('SELECT gender, number_of_respondents FROM cogs121_16_raw.cdph_smoking_prevalence_in_adults_1984_2013 where year = 2003;',
-     function(err, result) {
-      if(err) {
-        return console.error('error running query', err);
+  // return { delphidata: "No data present." }
+
+  // get a pg client from the connection pool
+  pg.connect(conString, function(err, client, done) {
+
+    var handleError = function(err) {
+      // no error occurred, continue with the request
+      if(!err) {
+        return false;
       }
+      // An error occurred, remove the client from the connection pool.
+      if(client){
+        done(client);
+      }
+      res.writeHead(500, {'content-type': 'text/plain'});
+      res.end('An error occurred');
+      return true;
+    };
+    if(handleError(err)) return;
+
+    client.query('SELECT number_of_respondents, gender FROM cogs121_16_raw.cdph_smoking_prevalence_in_adults_1984_2013 WHERE year=2003', function(err, result) {
+      if(handleError(err)) return;
       var data = result.rows;
-      console.log (data);
-      client.end();
-      res.json(data);
+      console.log(data);
+      res.json(data);    
     });
   });
-
-  //return { delphidata: "No data present." }
 });
 
 
